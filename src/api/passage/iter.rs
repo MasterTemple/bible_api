@@ -1,6 +1,6 @@
 use crate::data::{book::BibleBook, verse::BibleVerse};
 
-use super::passage::Passage;
+use super::{passage::Passage, segments::PassageSegment};
 
 pub struct PassageSegmentIterator<'a> {
     book: BibleBook<'a>,
@@ -58,6 +58,55 @@ impl<'a> Iterator for PassageSegmentIterator<'a> {
         }
 
         verse
+    }
+}
+
+impl<'a> Passage<'a> {
+    pub fn iter_segments(&'a self) -> PassageSegmentsIterator<'a> {
+        PassageSegmentsIterator {
+            passage: &self,
+            segment_index: 0,
+        }
+    }
+}
+
+pub struct PassageSegmentsIterator<'a> {
+    passage: &'a Passage<'a>,
+    segment_index: usize,
+}
+
+// impl<'a> Iterator for PassageSegmentsIterator<'a> {
+//     type Item = PassageSegmentIterator<'a>;
+//
+//     fn next(&mut self) -> Option<Self::Item> {
+//         let segment = self.passage.segments.get(self.segment_index)?;
+//         self.segment_index += 1;
+//         let segment_iterator = PassageSegmentIterator::new(
+//             self.passage.book,
+//             segment.get_starting_chapter(),
+//             segment.get_ending_chapter(),
+//             segment.get_starting_verse(),
+//             segment.get_ending_verse(),
+//         );
+//
+//         Some(segment_iterator)
+//     }
+// }
+impl<'a> Iterator for PassageSegmentsIterator<'a> {
+    type Item = PassageSegment;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let segment = self.passage.segments.get(self.segment_index)?;
+        self.segment_index += 1;
+        // let segment_iterator = PassageSegmentIterator::new(
+        //     self.passage.book,
+        //     segment.get_starting_chapter(),
+        //     segment.get_ending_chapter(),
+        //     segment.get_starting_verse(),
+        //     segment.get_ending_verse(),
+        // );
+
+        Some(segment.clone())
     }
 }
 

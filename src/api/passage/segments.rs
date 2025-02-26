@@ -7,7 +7,7 @@ use crate::data::{book::BibleBook, verse::BibleVerse};
 
 /// - This is a single chapter/verse reference
 /// - Ex: `1:2` in `John 1:2`
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct PassageVerse {
     pub chapter: usize,
     pub verse: usize,
@@ -15,7 +15,7 @@ pub struct PassageVerse {
 
 /// - This is a range of verse references within a single chapter
 /// - Ex: `1:2-3` `John 1:2-3`
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct PassageVerseRange {
     pub chapter: usize,
     pub start_verse: usize,
@@ -34,7 +34,7 @@ pub struct PassageVerseRange {
 
 /// - This is a range of verse references across a multiple chapters
 /// - Ex: `1:2-3:4` in `John 1:2-3:4`
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct PassageChapterRange {
     pub start_chapter: usize,
     pub end_chapter: usize,
@@ -58,7 +58,7 @@ pub struct PassageChapterRange {
 /// ```
 /// These should be grouped into a single reference
 ///
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum PassageSegment {
     /// - This is a single chapter/verse reference
     /// - Ex: `1:2` in `John 1:2`
