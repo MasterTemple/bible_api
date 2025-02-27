@@ -119,6 +119,19 @@ pub struct RelatedMediaProximity<'a> {
 }
 
 impl RelatedMediaBook {
+    pub fn get_all_passage_media(
+        &self,
+        passage_segment: PassageSegment,
+    ) -> Option<Vec<RelatedMediaProximity<'_>>> {
+        let start_verse = passage_segment.get_starting_verse();
+        let end_verse = passage_segment.get_ending_verse();
+        let start_chapter = passage_segment.get_starting_chapter();
+        let end_chapter = passage_segment.get_ending_chapter();
+
+        // self.get_chapter_verse_media()
+        todo!()
+    }
+
     pub fn get_passage_media(
         &self,
         passage_segment: PassageSegment,

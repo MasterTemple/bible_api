@@ -19,7 +19,7 @@ pub struct ApiData {
 }
 
 pub struct Api<'a, T> {
-    data: &'a ApiData,
+    pub api: &'a ApiData,
     _content: T,
 }
 
@@ -62,6 +62,12 @@ impl BibleAPI {
             bible: data,
             related_media: RelatedMediaBookOrganizer::default(),
         })
+    }
+    pub fn api<T>(&self, content: T) -> Api<'_, T> {
+        Api {
+            api: self,
+            _content: content,
+        }
     }
 
     pub fn add_media(&mut self, list: Vec<RelatedMedia>) {

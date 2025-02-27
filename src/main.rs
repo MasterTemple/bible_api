@@ -5,6 +5,7 @@ use bible_data::{
     bible_data::BibleData,
     formats::{json::JSONBible, parse::ParseBibleData},
 };
+use related_media::related_media::RelatedMedia;
 
 pub mod api;
 pub mod bible_data;
@@ -16,7 +17,14 @@ fn main() {
         .unwrap()
         .as_bible_data()
         .unwrap();
-    let api = BibleAPI::load(data);
+
+    let content =
+        std::fs::read_to_string(Path::new("/home/dglinuxtemple/related_media.json")).unwrap();
+    let related_media: Vec<RelatedMedia> = serde_json::from_str(&content).unwrap();
+
+    let mut api = BibleAPI::load(data);
+
+    api.add_media(related_media);
 
     // // 13ms on my machine with --release
     // let start = Instant::now();
@@ -28,13 +36,15 @@ fn main() {
     let passage = api.parse_reference("Ephesians 1:1-2,4-6,22-2:2,5,3:21-4:2");
     if let Some(passage) = passage {
         for verse in passage.clone().into_iter() {
+            let verse = api.api(verse);
             println!(
                 "[{} {}:{}] {:#?}",
                 verse.get_book().get_name(),
                 verse.chapter_number(),
                 verse.verse_number(),
-                // verse.get_related_media()
-                verse.get_content().unwrap_or("")
+                verse.get_related_media(),
+                // verse.get_content().unwrap_or("")
+                // verse.get_content().unwrap_or("")
             );
         }
 

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{
-        bible_api::{ApiData, BibleAPI},
+        bible_api::{Api, ApiData, BibleAPI},
         passage::segments::{ChapterVerse, PassageSegment},
     },
     related_media::related_media::{RelatedMedia, RelatedMediaProximity},
@@ -72,4 +72,16 @@ impl<'a> BibleVerse<'a> {
     //         }),
     //     )
     // }
+}
+
+impl Api<'_, BibleVerse<'_>> {
+    pub fn get_related_media(&self) -> Option<Vec<RelatedMediaProximity>> {
+        self.api.related_media.get_related_media(
+            self.book,
+            PassageSegment::ChapterVerse(ChapterVerse {
+                chapter: self.chapter,
+                verse: self.verse,
+            }),
+        )
+    }
 }
