@@ -5,6 +5,7 @@ use std::{
 };
 
 use regex::Regex;
+use serde::Serialize;
 
 use crate::api::bible_api::ApiData;
 
@@ -34,6 +35,7 @@ pub type BibleContents = Vec<ChapterDataList>;
 //
 
 /// This is it's own struct so it will be easier to add things like cross-references later
+#[derive(Clone, Serialize)]
 pub struct VerseData {
     pub(super) content: Option<String>,
 }
@@ -41,6 +43,7 @@ impl VerseData {}
 
 /// **NOTE: EVERYTHING IS INDEX 0**
 // #[derive(Debug)]
+#[derive(Clone, Serialize)]
 pub struct VerseDataList(pub(super) Vec<VerseData>);
 impl Deref for VerseDataList {
     type Target = Vec<VerseData>;
@@ -52,6 +55,7 @@ impl Deref for VerseDataList {
 
 /// **NOTE: EVERYTHING IS INDEX 0**
 // #[derive(Debug)]
+#[derive(Clone, Serialize)]
 pub struct ChapterDataList(pub(super) Vec<VerseDataList>);
 impl Deref for ChapterDataList {
     type Target = Vec<VerseDataList>;

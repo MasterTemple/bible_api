@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::api::bible_api::BibleAPI;
 
 use super::{
@@ -6,9 +8,10 @@ use super::{
     verse::BibleVerse,
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize)]
 pub struct BibleBook<'a> {
     // pub(super) api: &'a BibleAPI,
+    #[serde(skip)]
     pub(super) data: &'a BibleData,
     pub(super) book: usize,
     pub(super) name: &'a str,
