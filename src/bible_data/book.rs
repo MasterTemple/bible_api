@@ -1,3 +1,5 @@
+use crate::api::bible_api::BibleAPI;
+
 use super::{
     bible_data::{BibleData, ChapterDataList, VerseDataList},
     chapter::BibleChapter,
@@ -6,6 +8,7 @@ use super::{
 
 #[derive(Clone, Copy)]
 pub struct BibleBook<'a> {
+    // pub(super) api: &'a BibleAPI,
     pub(super) data: &'a BibleData,
     pub(super) book: usize,
     pub(super) name: &'a str,
@@ -24,6 +27,7 @@ impl<'a> BibleBook<'a> {
         let verses: &'a VerseDataList = self.chapters.get(chapter - 1)?;
         Some(BibleChapter {
             data: self.data,
+            // api: self.api,
             book: self.book,
             chapter,
             verses,

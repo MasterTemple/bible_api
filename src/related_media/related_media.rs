@@ -112,6 +112,7 @@ pub struct RelatedMediaBook {
     chapter_range: OverlapMap<ChapterRangePair, Vec<RelatedMediaRef>>,
 }
 
+#[derive(Debug)]
 pub struct RelatedMediaProximity<'a> {
     related_media: &'a Vec<RelatedMediaRef>,
     proximity: PassageSegment,

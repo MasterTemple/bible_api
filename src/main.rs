@@ -18,28 +18,30 @@ fn main() {
         .unwrap();
     let api = BibleAPI::load(data);
 
-    // 13ms on my machine with --release
-    let start = Instant::now();
-    for _ in 1..10_000 {
-        let passage = api.parse_reference("Ephesians 1:1-2,4-6,22-2:2,5,3:21-4:2");
-    }
-    println!("{}ms", start.elapsed().as_millis());
-
-    // let passage = api.parse_reference("Ephesians 1:1-2,4-6,22-2:2,5,3:21-4:2");
-    // if let Some(passage) = passage {
-    //     // for seg in passage.clone().into_iter() {
-    //     //     println!(
-    //     //         "[{}:{}] {}",
-    //     //         seg.chapter_number(),
-    //     //         seg.verse_number(),
-    //     //         seg.get_content().unwrap_or("")
-    //     //     );
-    //     // }
-    //
-    //     let formatter = PassageFormatterBuilder::new().build();
-    //     let output = passage.format(&formatter);
-    //     println!("{}", output);
-    // } else {
-    //     println!("No passage found");
+    // // 13ms on my machine with --release
+    // let start = Instant::now();
+    // for _ in 1..10_000 {
+    //     let passage = api.parse_reference("Ephesians 1:1-2,4-6,22-2:2,5,3:21-4:2");
     // }
+    // println!("{}ms", start.elapsed().as_millis());
+
+    let passage = api.parse_reference("Ephesians 1:1-2,4-6,22-2:2,5,3:21-4:2");
+    if let Some(passage) = passage {
+        for verse in passage.clone().into_iter() {
+            println!(
+                "[{} {}:{}] {:#?}",
+                verse.get_book().get_name(),
+                verse.chapter_number(),
+                verse.verse_number(),
+                // verse.get_related_media()
+                verse.get_content().unwrap_or("")
+            );
+        }
+
+        let formatter = PassageFormatterBuilder::new().build();
+        let output = passage.format(&formatter);
+        println!("{}", output);
+    } else {
+        println!("No passage found");
+    }
 }

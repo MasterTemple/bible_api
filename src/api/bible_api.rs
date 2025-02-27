@@ -11,8 +11,8 @@ use super::passage::passage::Passage;
 /// purposes (I think it is more appropriate to put here than on [`BibleData`])
 /// - Actually maybe not lol
 pub struct BibleAPI {
-    data: BibleData,
-    related_media: RelatedMediaBookOrganizer,
+    pub(crate) data: BibleData,
+    pub(crate) related_media: RelatedMediaBookOrganizer,
 }
 
 impl BibleAPI {

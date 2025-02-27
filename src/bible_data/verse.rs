@@ -1,7 +1,16 @@
+use crate::{
+    api::{
+        bible_api::BibleAPI,
+        passage::segments::{ChapterVerse, PassageSegment},
+    },
+    related_media::related_media::{RelatedMedia, RelatedMediaProximity},
+};
+
 use super::{bible_data::BibleData, book::BibleBook, chapter::BibleChapter};
 
 #[derive(Clone, Copy)]
 pub struct BibleVerse<'a> {
+    // pub(super) api: &'a BibleAPI,
     pub(super) data: &'a BibleData,
     pub(super) book: usize,
     pub(super) chapter: usize,
@@ -50,4 +59,14 @@ impl<'a> BibleVerse<'a> {
     pub fn get_content(&self) -> Option<&'a str> {
         self.content
     }
+
+    // pub fn get_related_media(&self) -> Option<Vec<RelatedMediaProximity>> {
+    //     self.api.related_media.get_related_media(
+    //         self.book,
+    //         PassageSegment::ChapterVerse(ChapterVerse {
+    //             chapter: self.chapter,
+    //             verse: self.verse,
+    //         }),
+    //     )
+    // }
 }
