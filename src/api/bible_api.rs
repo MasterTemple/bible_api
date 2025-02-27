@@ -1,6 +1,7 @@
 use crate::{
-    api::passage::segments::PassageSegments, bible_data::bible_data::BibleData,
-    related_media::related_media::RelatedMediaBookOrganizer,
+    api::passage::segments::PassageSegments,
+    bible_data::bible_data::BibleData,
+    related_media::related_media::{RelatedMedia, RelatedMediaBookOrganizer},
 };
 
 use super::passage::passage::Passage;
@@ -11,9 +12,7 @@ use super::passage::passage::Passage;
 /// - Actually maybe not lol
 pub struct BibleAPI {
     data: BibleData,
-    related_media: RelatedMediaBookOrganizer, // /// This is dynamically generated for several reasons
-                                              // /// - I am guaranteed that I only match on books that will return a result
-                                              // book_regex: Regex,
+    related_media: RelatedMediaBookOrganizer,
 }
 
 impl BibleAPI {
@@ -22,6 +21,10 @@ impl BibleAPI {
             data,
             related_media: RelatedMediaBookOrganizer::default(),
         }
+    }
+
+    pub fn add_media(&mut self, list: Vec<RelatedMedia>) {
+        self.related_media.add_related_media(list);
     }
 
     /// This is meant to parse only 1 reference

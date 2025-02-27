@@ -49,8 +49,13 @@ impl<K: Ord + Clone, V: Default> MapExtensions<K, V> for BTreeMap<K, V> {
 pub struct RelatedMediaBookOrganizer(BTreeMap<usize, RelatedMediaBook>);
 impl RelatedMediaBookOrganizer {
     // do i want to take BookPassageRange (i probably want something like this) or book and then PassageSegment?
-    pub fn get_related_media(&self) -> RelatedMediaProximity {
-        todo!()
+    pub fn get_related_media(
+        &self,
+        book: usize,
+        passage_segment: PassageSegment,
+    ) -> Option<Vec<RelatedMediaProximity>> {
+        let media_book = self.0.get(&book)?;
+        media_book.get_passage_media(passage_segment)
     }
 
     pub fn add_related_media(&mut self, list: Vec<RelatedMedia>) {
@@ -113,6 +118,23 @@ pub struct RelatedMediaProximity<'a> {
 }
 
 impl RelatedMediaBook {
+    pub fn get_passage_media(
+        &self,
+        passage_segment: PassageSegment,
+    ) -> Option<Vec<RelatedMediaProximity<'_>>> {
+        match passage_segment {
+            PassageSegment::ChapterVerse(ChapterVerse { chapter, verse }) => self
+                .get_chapter_verse_media(chapter, verse)
+                .map(|it| vec![it]),
+            PassageSegment::ChapterVerseRange(ChapterVerseRange { chapter, verses }) => {
+                self.get_chapter_verse_range_media(chapter, verses.start, verses.end)
+            }
+            PassageSegment::ChapterRange(ChapterRange { start, end }) => {
+                self.get_chapter_range_media(start.chapter, start.verse, end.chapter, end.verse)
+            }
+        }
+    }
+
     pub fn get_chapter_verse_media(
         &self,
         chapter: usize,
