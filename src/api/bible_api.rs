@@ -1,26 +1,61 @@
+use std::ops::{Deref, DerefMut};
+
 use crate::{
     api::passage::segments::PassageSegments,
-    bible_data::bible_data::BibleData,
+    bible_data::{bible_data::BibleData, formats::parse::ParseBibleData},
     related_media::related_media::{RelatedMedia, RelatedMediaBookOrganizer},
 };
 
 use super::passage::passage::Passage;
 
-/// - This is meant to hold [`BibleData`] but also to provide helpful methods for interacting with it
-/// - There will be several other fields contained, but it is primarily for caching/indexing
-/// purposes (I think it is more appropriate to put here than on [`BibleData`])
-/// - Actually maybe not lol
-pub struct BibleAPI {
+pub struct ApiData {
     pub(crate) data: BibleData,
     pub(crate) related_media: RelatedMediaBookOrganizer,
 }
 
+pub struct Api<'a, T> {
+    data: &'a ApiData,
+    _content: T,
+}
+
+impl<T> Deref for Api<'_, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self._content
+    }
+}
+impl<T> DerefMut for Api<'_, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self._content
+    }
+}
+
+/// - This is meant to hold [`BibleData`] but also to provide helpful methods for interacting with it
+/// - There will be several other fields contained, but it is primarily for caching/indexing
+/// purposes (I think it is more appropriate to put here than on [`BibleData`])
+/// - Actually maybe not lol
+pub struct BibleAPI(ApiData);
+
+impl Deref for BibleAPI {
+    type Target = ApiData;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl DerefMut for BibleAPI {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 impl BibleAPI {
     pub fn load(data: BibleData) -> Self {
-        Self {
+        Self(ApiData {
             data,
             related_media: RelatedMediaBookOrganizer::default(),
-        }
+        })
     }
 
     pub fn add_media(&mut self, list: Vec<RelatedMedia>) {

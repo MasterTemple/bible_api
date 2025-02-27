@@ -6,6 +6,8 @@ use std::{
 
 use regex::Regex;
 
+use crate::api::bible_api::ApiData;
+
 use super::{book::BibleBook, chapter::BibleChapter, verse::BibleVerse};
 
 /// map of abbreviations and actual name (all lowercase) to book id
@@ -71,6 +73,7 @@ impl Deref for BookDataList {
 }
 
 pub struct BibleData {
+    // pub data: &'a AppData,
     /// regex to match all book names or abbreviations that are part of this data set
     pub book_regex: Regex,
     /// map of abbreviations and actual name (all lowercase) to book id

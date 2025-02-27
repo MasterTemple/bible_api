@@ -3,9 +3,12 @@ use std::path::Path;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::bible_data::bible_data::{
-    AbbreviationsToBookId, BibleContents, BibleData, BookDataList, BookIdToName, ChapterDataList,
-    ReferenceArray, VerseData, VerseDataList,
+use crate::{
+    api::bible_api::BibleAPI,
+    bible_data::bible_data::{
+        AbbreviationsToBookId, BibleContents, BibleData, BookDataList, BookIdToName,
+        ChapterDataList, ReferenceArray, VerseData, VerseDataList,
+    },
 };
 
 use super::parse::ParseBibleData;
