@@ -1,4 +1,7 @@
-use std::collections::BTreeMap;
+use std::{
+    collections::BTreeMap,
+    ops::{Deref, DerefMut},
+};
 
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -8,6 +11,26 @@ pub trait OverlapsWith {
 }
 
 pub struct OverlapMap<K: Ord + OverlapsWith, V>(BTreeMap<K, V>);
+impl<K: Ord + OverlapsWith, V> Deref for OverlapMap<K, V> {
+    type Target = BTreeMap<K, V>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<K: Ord + OverlapsWith, V> DerefMut for OverlapMap<K, V> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<K: Ord + OverlapsWith, V> Default for OverlapMap<K, V> {
+    fn default() -> Self {
+        Self(BTreeMap::new())
+    }
+}
+
 impl<K: Ord + OverlapsWith, V> OverlapMap<K, V> {
     pub fn iter_overlapping(&self, this: K) -> impl Iterator<Item = (&K, &V)> {
         // I could maybe do some heuristics to search through less, but this is fine for

@@ -3,7 +3,9 @@ use std::{collections::BTreeMap, path::Path, rc::Rc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::api::passage::segments::PassageSegment;
+use crate::api::passage::segments::{
+    ChapterRange, ChapterVerse, ChapterVerseRange, PassageSegment,
+};
 
 use super::{
     formats::json::JSONRelatedMedia,
@@ -21,12 +23,81 @@ pub type RelatedMedia = JSONRelatedMedia;
 
 pub type RelatedMediaRef = Rc<RelatedMedia>;
 
+pub trait MapExtensions<K, V> {
+    fn get_or_insert(&mut self, key: &K) -> &V;
+    fn get_or_insert_mut(&mut self, key: &K) -> &mut V;
+}
+
+impl<K: Ord + Clone, V: Default> MapExtensions<K, V> for BTreeMap<K, V> {
+    fn get_or_insert(&mut self, key: &K) -> &V {
+        if !self.contains_key(key) {
+            _ = self.insert(key.clone(), V::default());
+        }
+        self.get(key).unwrap()
+    }
+
+    fn get_or_insert_mut(&mut self, key: &K) -> &mut V {
+        if !self.contains_key(key) {
+            _ = self.insert(key.clone(), V::default());
+        }
+        self.get_mut(key).unwrap()
+    }
+}
+
 /// Related media is organized by book
-pub type RelatedMediaBookOrganizer = BTreeMap<usize, RelatedMediaBook>;
+#[derive(Default)]
+pub struct RelatedMediaBookOrganizer(BTreeMap<usize, RelatedMediaBook>);
+impl RelatedMediaBookOrganizer {
+    // do i want to take BookPassageRange (i probably want something like this) or book and then PassageSegment?
+    pub fn get_related_media(&self) -> RelatedMediaProximity {
+        todo!()
+    }
+
+    pub fn add_related_media(&mut self, list: Vec<RelatedMedia>) {
+        for item in list {
+            let rc_item = Rc::new(item);
+            for reference in rc_item.references.iter() {
+                let book = reference.book;
+                let media_book = self.0.get_or_insert_mut(&book);
+                for seg in reference.segments.0.iter() {
+                    match seg {
+                        PassageSegment::ChapterVerse(ChapterVerse { chapter, verse }) => {
+                            let chapter_map = media_book.chapter_verse.get_or_insert_mut(&chapter);
+                            let list = chapter_map.get_or_insert_mut(&verse);
+                            list.push(rc_item.clone());
+                        }
+                        PassageSegment::ChapterVerseRange(ChapterVerseRange {
+                            chapter,
+                            verses,
+                        }) => {
+                            let chapter_map =
+                                media_book.chapter_verse_range.get_or_insert_mut(&chapter);
+                            let list = chapter_map.get_or_insert_mut(&verses);
+                            list.push(rc_item.clone());
+                        }
+                        PassageSegment::ChapterRange(ChapterRange { start, end }) => {
+                            let chapter_range_pair = ChapterRangePair::new(
+                                start.chapter,
+                                start.verse,
+                                end.chapter,
+                                end.verse,
+                            );
+                            let list = media_book
+                                .chapter_range
+                                .get_or_insert_mut(&chapter_range_pair);
+                            list.push(rc_item.clone())
+                        }
+                    };
+                }
+            }
+        }
+    }
+}
 
 /**
 This is references to all the related media for a book
 */
+#[derive(Default)]
 pub struct RelatedMediaBook {
     // chapter:verse (Map<chapter, Map<verse, Vec<ref>>>)
     chapter_verse: BTreeMap<usize, BTreeMap<usize, Vec<RelatedMediaRef>>>,
