@@ -1,4 +1,4 @@
-use crate::data::{book::BibleBook, verse::BibleVerse};
+use crate::bible_data::{book::BibleBook, verse::BibleVerse};
 
 use super::{passage::Passage, segments::PassageSegment};
 

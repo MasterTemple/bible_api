@@ -2,44 +2,35 @@ use std::ops::{Deref, DerefMut};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
-use crate::data::{book::BibleBook, verse::BibleVerse};
+use crate::{
+    bible_data::{book::BibleBook, verse::BibleVerse},
+    related_media::overlapping_ranges::RangePair,
+};
 
 /// - This is a single chapter/verse reference
 /// - Ex: `1:2` in `John 1:2`
-#[derive(Copy, Clone, Debug)]
-pub struct PassageVerse {
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+pub struct ChapterVerse {
     pub chapter: usize,
     pub verse: usize,
 }
 
 /// - This is a range of verse references within a single chapter
 /// - Ex: `1:2-3` `John 1:2-3`
-#[derive(Copy, Clone, Debug)]
-pub struct PassageVerseRange {
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+pub struct ChapterVerseRange {
     pub chapter: usize,
-    pub start_verse: usize,
-    pub end_verse: usize,
+    pub verses: RangePair,
 }
-
-// impl<'a> IntoIterator for PassageVerseRange {
-//     type Item = BibleVerse<'a>;
-//
-//     type IntoIter = PassageIterator<'a>;
-//
-//     fn into_iter(self) -> Self::IntoIter {
-//         PassageIterator::new(self.chapter, self.chapter, self.start_verse, self.end_verse)
-//     }
-// }
 
 /// - This is a range of verse references across a multiple chapters
 /// - Ex: `1:2-3:4` in `John 1:2-3:4`
-#[derive(Copy, Clone, Debug)]
-pub struct PassageChapterRange {
-    pub start_chapter: usize,
-    pub end_chapter: usize,
-    pub start_verse: usize,
-    pub end_verse: usize,
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+pub struct ChapterRange {
+    pub start: ChapterVerse,
+    pub end: ChapterVerse,
 }
 
 /// Remember, these correspond to
@@ -58,45 +49,80 @@ pub struct PassageChapterRange {
 /// ```
 /// These should be grouped into a single reference
 ///
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum PassageSegment {
     /// - This is a single chapter/verse reference
     /// - Ex: `1:2` in `John 1:2`
-    PassageVerse(PassageVerse),
+    ChapterVerse(ChapterVerse),
     /// - This is a range of verse references within a single chapter
     /// - Ex: `1:2-3` `John 1:2-3`
-    PassageVerseRange(PassageVerseRange),
+    ChapterVerseRange(ChapterVerseRange),
     /// - This is a range of verse references across a multiple chapters
     /// - Ex: `John 1:2-3:4`
-    PassageChapterRange(PassageChapterRange),
+    ChapterRange(ChapterRange),
+}
+
+impl PassageSegment {
+    pub fn chapter_verse(chapter: usize, verse: usize) -> Self {
+        Self::ChapterVerse(ChapterVerse { chapter, verse })
+    }
+
+    pub fn chapter_verse_range(chapter: usize, start_verse: usize, end_verse: usize) -> Self {
+        Self::ChapterVerseRange(ChapterVerseRange {
+            chapter,
+            verses: RangePair {
+                start: start_verse,
+                end: end_verse,
+            },
+        })
+    }
+
+    pub fn chapter_range(
+        start_chapter: usize,
+        start_verse: usize,
+        end_chapter: usize,
+        end_verse: usize,
+    ) -> Self {
+        Self::ChapterRange(ChapterRange {
+            start: ChapterVerse {
+                chapter: start_chapter,
+                verse: start_verse,
+            },
+            end: ChapterVerse {
+                chapter: end_chapter,
+                verse: end_verse,
+            },
+        })
+    }
 }
 
 impl PassageSegment {
     pub fn label(&self) -> String {
         match self {
-            PassageSegment::PassageVerse(chapter_verse) => {
+            PassageSegment::ChapterVerse(chapter_verse) => {
                 format!("{}:{}", chapter_verse.chapter, chapter_verse.verse)
             }
-            PassageSegment::PassageVerseRange(chapter_range) => {
+            PassageSegment::ChapterVerseRange(chapter_range) => {
                 format!(
                     "{}:{}-{}",
-                    chapter_range.chapter, chapter_range.start_verse, chapter_range.end_verse
+                    chapter_range.chapter, chapter_range.verses.start, chapter_range.verses.end
                 )
             }
-            PassageSegment::PassageChapterRange(book_range) => {
+            PassageSegment::ChapterRange(book_range) => {
                 format!(
                     "{}:{}-{}:{}",
-                    book_range.start_chapter,
-                    book_range.start_verse,
-                    book_range.end_chapter,
-                    book_range.end_verse
+                    book_range.start.chapter,
+                    book_range.start.verse,
+                    book_range.end.chapter,
+                    book_range.end.verse
                 )
             }
         }
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PassageSegments(pub Vec<PassageSegment>);
 
 impl PassageSegments {
@@ -123,38 +149,41 @@ impl PassageSegments {
         // let mut label_str = String::new();
         for seg in self.0.iter() {
             let next_seg = match seg {
-                PassageSegment::PassageVerse(chapter_verse) => {
+                PassageSegment::ChapterVerse(chapter_verse) => {
                     if previous_chapter.is_some_and(|prev| prev == chapter_verse.chapter) {
                         format!("{}", chapter_verse.verse)
                     } else {
                         format!("{}:{}", chapter_verse.chapter, chapter_verse.verse)
                     }
                 }
-                PassageSegment::PassageVerseRange(chapter_range) => {
+                PassageSegment::ChapterVerseRange(chapter_range) => {
                     if previous_chapter.is_some_and(|prev| prev == chapter_range.chapter) {
-                        format!("{}-{}", chapter_range.start_verse, chapter_range.end_verse)
+                        format!(
+                            "{}-{}",
+                            chapter_range.verses.start, chapter_range.verses.end
+                        )
                     } else {
                         format!(
                             "{}:{}-{}",
                             chapter_range.chapter,
-                            chapter_range.start_verse,
-                            chapter_range.end_verse
+                            chapter_range.verses.start,
+                            chapter_range.verses.end
                         )
                     }
                 }
-                PassageSegment::PassageChapterRange(book_range) => {
-                    if previous_chapter.is_some_and(|prev| prev == book_range.start_chapter) {
+                PassageSegment::ChapterRange(book_range) => {
+                    if previous_chapter.is_some_and(|prev| prev == book_range.start.chapter) {
                         format!(
                             "{}-{}:{}",
-                            book_range.start_verse, book_range.end_chapter, book_range.end_verse
+                            book_range.start.verse, book_range.end.chapter, book_range.end.verse
                         )
                     } else {
                         format!(
                             "{}:{}-{}:{}",
-                            book_range.start_chapter,
-                            book_range.start_verse,
-                            book_range.end_chapter,
-                            book_range.end_verse
+                            book_range.start.chapter,
+                            book_range.start.verse,
+                            book_range.end.chapter,
+                            book_range.end.verse
                         )
                     }
                 }
@@ -200,33 +229,33 @@ impl DerefMut for PassageSegments {
 impl PassageSegment {
     pub fn get_starting_verse(&self) -> usize {
         match self {
-            PassageSegment::PassageVerse(chapter_verse) => chapter_verse.verse,
-            PassageSegment::PassageVerseRange(chapter_range) => chapter_range.start_verse,
-            PassageSegment::PassageChapterRange(book_range) => book_range.start_verse,
+            PassageSegment::ChapterVerse(chapter_verse) => chapter_verse.verse,
+            PassageSegment::ChapterVerseRange(chapter_range) => chapter_range.verses.start,
+            PassageSegment::ChapterRange(book_range) => book_range.start.verse,
         }
     }
 
     pub fn get_starting_chapter(&self) -> usize {
         match self {
-            PassageSegment::PassageVerse(chapter_verse) => chapter_verse.chapter,
-            PassageSegment::PassageVerseRange(chapter_range) => chapter_range.chapter,
-            PassageSegment::PassageChapterRange(book_range) => book_range.start_chapter,
+            PassageSegment::ChapterVerse(chapter_verse) => chapter_verse.chapter,
+            PassageSegment::ChapterVerseRange(chapter_range) => chapter_range.chapter,
+            PassageSegment::ChapterRange(book_range) => book_range.start.chapter,
         }
     }
 
     pub fn get_ending_verse(&self) -> usize {
         match self {
-            PassageSegment::PassageVerse(chapter_verse) => chapter_verse.verse,
-            PassageSegment::PassageVerseRange(chapter_range) => chapter_range.end_verse,
-            PassageSegment::PassageChapterRange(book_range) => book_range.end_verse,
+            PassageSegment::ChapterVerse(chapter_verse) => chapter_verse.verse,
+            PassageSegment::ChapterVerseRange(chapter_range) => chapter_range.verses.end,
+            PassageSegment::ChapterRange(book_range) => book_range.end.verse,
         }
     }
 
     pub fn get_ending_chapter(&self) -> usize {
         match self {
-            PassageSegment::PassageVerse(chapter_verse) => chapter_verse.chapter,
-            PassageSegment::PassageVerseRange(chapter_range) => chapter_range.chapter,
-            PassageSegment::PassageChapterRange(book_range) => book_range.end_chapter,
+            PassageSegment::ChapterVerse(chapter_verse) => chapter_verse.chapter,
+            PassageSegment::ChapterVerseRange(chapter_range) => chapter_range.chapter,
+            PassageSegment::ChapterRange(book_range) => book_range.end.chapter,
         }
     }
 }
@@ -290,39 +319,51 @@ fn parse_reference_segments(segment_input: &str) -> PassageSegments {
                 // `ch1:v1 - ch2:v2`
                 (Some((ch1, v1)), Some((ch2, v2))) => {
                     chapter = ch2.parse().unwrap();
-                    segments.push(PassageSegment::PassageChapterRange(PassageChapterRange {
-                        start_chapter: ch1.parse().unwrap(),
-                        end_chapter: chapter,
-                        start_verse: v1.parse().unwrap(),
-                        end_verse: v2.parse().unwrap(),
+                    segments.push(PassageSegment::ChapterRange(ChapterRange {
+                        start: ChapterVerse {
+                            chapter: ch1.parse().unwrap(),
+                            verse: v1.parse().unwrap(),
+                        },
+                        end: ChapterVerse {
+                            chapter,
+                            verse: v2.parse().unwrap(),
+                        },
                     }));
                 }
                 // `ch1:v1 - v2`
                 (Some((ch1, v1)), None) => {
                     chapter = ch1.parse().unwrap();
-                    segments.push(PassageSegment::PassageVerseRange(PassageVerseRange {
+                    segments.push(PassageSegment::ChapterVerseRange(ChapterVerseRange {
                         chapter,
-                        start_verse: v1.parse().unwrap(),
-                        end_verse: right.parse().unwrap(),
+                        verses: RangePair {
+                            start: v1.parse().unwrap(),
+                            end: right.parse().unwrap(),
+                        },
                     }));
                 }
                 // `v1 - ch2:v2`
                 (None, Some((ch2, v2))) => {
                     let start_chapter = chapter;
                     chapter = ch2.parse().unwrap();
-                    segments.push(PassageSegment::PassageChapterRange(PassageChapterRange {
-                        start_chapter,
-                        end_chapter: chapter,
-                        start_verse: left.parse().unwrap(),
-                        end_verse: v2.parse().unwrap(),
+                    segments.push(PassageSegment::ChapterRange(ChapterRange {
+                        start: ChapterVerse {
+                            chapter,
+                            verse: left.parse().unwrap(),
+                        },
+                        end: ChapterVerse {
+                            chapter,
+                            verse: v2.parse().unwrap(),
+                        },
                     }));
                 }
                 // `v1 - v2`
                 (None, None) => {
-                    segments.push(PassageSegment::PassageVerseRange(PassageVerseRange {
+                    segments.push(PassageSegment::ChapterVerseRange(ChapterVerseRange {
                         chapter,
-                        start_verse: left.parse().unwrap(),
-                        end_verse: right.parse().unwrap(),
+                        verses: RangePair {
+                            start: left.parse().unwrap(),
+                            end: right.parse().unwrap(),
+                        },
                     }))
                 }
             };
@@ -332,7 +373,7 @@ fn parse_reference_segments(segment_input: &str) -> PassageSegments {
             // handle `ch:v`
             if let Some((ch, v)) = range.split_once(":") {
                 chapter = ch.parse().unwrap();
-                segments.push(PassageSegment::PassageVerse(PassageVerse {
+                segments.push(PassageSegment::ChapterVerse(ChapterVerse {
                     chapter,
                     verse: v.parse().unwrap(),
                 }))
@@ -340,7 +381,7 @@ fn parse_reference_segments(segment_input: &str) -> PassageSegments {
             // handle `v`
             else {
                 let v = range.parse().unwrap();
-                segments.push(PassageSegment::PassageVerse(PassageVerse {
+                segments.push(PassageSegment::ChapterVerse(ChapterVerse {
                     chapter,
                     verse: v,
                 }))

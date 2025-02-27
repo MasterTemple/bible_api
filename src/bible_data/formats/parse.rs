@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::data::bible_data::BibleData;
+use crate::bible_data::bible_data::BibleData;
 
 pub trait ParseBibleData: Sized {
     fn parse_file(path: &Path) -> Result<Self, Box<dyn std::error::Error>>;

@@ -3,7 +3,7 @@ use std::path::Path;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::data::bible_data::{
+use crate::bible_data::bible_data::{
     AbbreviationsToBookId, BibleContents, BibleData, BookDataList, BookIdToName, ChapterDataList,
     ReferenceArray, VerseData, VerseDataList,
 };

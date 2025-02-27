@@ -1,0 +1,53 @@
+thread 'rustc' panicked at /rustc/b91a3a05609a46f73d23e0995ae7ebb4a4f429a5/compiler/rustc_query_system/src/query/plumbing.rs:734:9:
+Found unstable fingerprints for evaluate_obligation(bdd86c79cc879428-460be34bb08ed778): Ok(EvaluatedToErr)
+stack backtrace:
+   0:     0x7e8fcef431a5 - std::backtrace::Backtrace::create::hb7d502d307299544
+   1:     0x7e8fcd4404c5 - std::backtrace::Backtrace::force_capture::h757333e8f73b0179
+   2:     0x7e8fcc4d28ad - std[56fe22ad9ea837fd]::panicking::update_hook::<alloc[b5641001d343df5f]::boxed::Box<rustc_driver_impl[945e9afaf49c7d35]::install_ice_hook::{closure#0}>>::{closure#0}
+   3:     0x7e8fcd457be8 - std::panicking::rust_panic_with_hook::h657fdcc17f7e2546
+   4:     0x7e8fcd4579ba - std::panicking::begin_panic_handler::{{closure}}::h6c1a7592f2611ed5
+   5:     0x7e8fcd455629 - std::sys::backtrace::__rust_end_short_backtrace::h3e1efd1ff0b15465
+   6:     0x7e8fcd45767c - rust_begin_unwind
+   7:     0x7e8fc9ecd320 - core::panicking::panic_fmt::h41647251c9f15c53
+   8:     0x7e8fccee2142 - rustc_query_system[887bb79932b1d8c1]::query::plumbing::incremental_verify_ich_failed::<rustc_middle[f0eb6ba890d0a9bb]::ty::context::TyCtxt>
+   9:     0x7e8fcddffb20 - rustc_query_system[887bb79932b1d8c1]::query::plumbing::try_execute_query::<rustc_query_impl[1357963d8dd30e8b]::DynamicConfig<rustc_query_system[887bb79932b1d8c1]::query::caches::DefaultCache<rustc_type_ir[8408d34320f8a6fb]::canonical::CanonicalQueryInput<rustc_middle[f0eb6ba890d0a9bb]::ty::context::TyCtxt, rustc_middle[f0eb6ba890d0a9bb]::ty::ParamEnvAnd<rustc_middle[f0eb6ba890d0a9bb]::ty::predicate::Predicate>>, rustc_middle[f0eb6ba890d0a9bb]::query::erase::Erased<[u8; 2usize]>>, false, false, false>, rustc_query_impl[1357963d8dd30e8b]::plumbing::QueryCtxt, true>
+  10:     0x7e8fcddfdcba - rustc_query_impl[1357963d8dd30e8b]::query_impl::evaluate_obligation::get_query_incr::__rust_end_short_backtrace
+  11:     0x7e8fcdeeaef4 - <rustc_infer[21ddc8b2a5f19898]::infer::InferCtxt as rustc_trait_selection[c0f45c4e16f8dab6]::traits::query::evaluate_obligation::InferCtxtExt>::evaluate_obligation_no_overflow
+  12:     0x7e8fce2fee3c - <core[5ba82ee3405aa490]::iter::adapters::filter::Filter<core[5ba82ee3405aa490]::iter::adapters::map::Map<core[5ba82ee3405aa490]::slice::iter::Iter<rustc_hir_typeck[9dbf9add14d719fd]::method::probe::Candidate>, <rustc_hir_typeck[9dbf9add14d719fd]::method::probe::ProbeContext>::consider_candidates::{closure#0}>, <rustc_hir_typeck[9dbf9add14d719fd]::method::probe::ProbeContext>::consider_candidates::{closure#1}> as core[5ba82ee3405aa490]::iter::traits::iterator::Iterator>::next
+  13:     0x7e8fce2d3fb2 - <rustc_hir_typeck[9dbf9add14d719fd]::method::probe::ProbeContext>::pick_method
+  14:     0x7e8fce2d3424 - <rustc_hir_typeck[9dbf9add14d719fd]::method::probe::ProbeContext>::pick_core
+  15:     0x7e8fce2d1c0b - <rustc_hir_typeck[9dbf9add14d719fd]::fn_ctxt::FnCtxt>::lookup_probe
+  16:     0x7e8fce8facd1 - <rustc_hir_typeck[9dbf9add14d719fd]::fn_ctxt::FnCtxt>::check_expr_with_expectation_and_args
+  17:     0x7e8fce8f4819 - <rustc_hir_typeck[9dbf9add14d719fd]::fn_ctxt::FnCtxt>::check_block_with_expected
+  18:     0x7e8fce8fabb4 - <rustc_hir_typeck[9dbf9add14d719fd]::fn_ctxt::FnCtxt>::check_expr_with_expectation_and_args
+  19:     0x7e8fcde4df5b - rustc_hir_typeck[9dbf9add14d719fd]::check::check_fn
+  20:     0x7e8fcde43bac - rustc_hir_typeck[9dbf9add14d719fd]::typeck
+  21:     0x7e8fcde43553 - rustc_query_impl[1357963d8dd30e8b]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[1357963d8dd30e8b]::query_impl::typeck::dynamic_query::{closure#2}::{closure#0}, rustc_middle[f0eb6ba890d0a9bb]::query::erase::Erased<[u8; 8usize]>>
+  22:     0x7e8fce3260ab - rustc_query_system[887bb79932b1d8c1]::query::plumbing::try_execute_query::<rustc_query_impl[1357963d8dd30e8b]::DynamicConfig<rustc_query_system[887bb79932b1d8c1]::query::caches::VecCache<rustc_span[db86d96c2ae2e3a4]::def_id::LocalDefId, rustc_middle[f0eb6ba890d0a9bb]::query::erase::Erased<[u8; 8usize]>>, false, false, false>, rustc_query_impl[1357963d8dd30e8b]::plumbing::QueryCtxt, true>
+  23:     0x7e8fcdfda594 - rustc_query_impl[1357963d8dd30e8b]::query_impl::typeck::get_query_incr::__rust_end_short_backtrace
+  24:     0x7e8fce3217c7 - <rustc_middle[f0eb6ba890d0a9bb]::hir::map::Map>::par_body_owners::<rustc_hir_analysis[af6e6fecb0b5810e]::check_crate::{closure#4}>::{closure#0}
+  25:     0x7e8fce31f799 - rustc_hir_analysis[af6e6fecb0b5810e]::check_crate
+  26:     0x7e8fce468aca - rustc_interface[5fea8bf9cd0b71b5]::passes::run_required_analyses
+  27:     0x7e8fcea0861e - rustc_interface[5fea8bf9cd0b71b5]::passes::analysis
+  28:     0x7e8fcea085ef - rustc_query_impl[1357963d8dd30e8b]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[1357963d8dd30e8b]::query_impl::analysis::dynamic_query::{closure#2}::{closure#0}, rustc_middle[f0eb6ba890d0a9bb]::query::erase::Erased<[u8; 1usize]>>
+  29:     0x7e8fced2657a - rustc_query_system[887bb79932b1d8c1]::query::plumbing::try_execute_query::<rustc_query_impl[1357963d8dd30e8b]::DynamicConfig<rustc_query_system[887bb79932b1d8c1]::query::caches::SingleCache<rustc_middle[f0eb6ba890d0a9bb]::query::erase::Erased<[u8; 1usize]>>, false, false, false>, rustc_query_impl[1357963d8dd30e8b]::plumbing::QueryCtxt, true>
+  30:     0x7e8fced26077 - rustc_query_impl[1357963d8dd30e8b]::query_impl::analysis::get_query_incr::__rust_end_short_backtrace
+  31:     0x7e8fcea8707a - rustc_interface[5fea8bf9cd0b71b5]::interface::run_compiler::<core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>, rustc_driver_impl[945e9afaf49c7d35]::run_compiler::{closure#0}>::{closure#1}
+  32:     0x7e8fceacd5d0 - std[56fe22ad9ea837fd]::sys::backtrace::__rust_begin_short_backtrace::<rustc_interface[5fea8bf9cd0b71b5]::util::run_in_thread_with_globals<rustc_interface[5fea8bf9cd0b71b5]::util::run_in_thread_pool_with_globals<rustc_interface[5fea8bf9cd0b71b5]::interface::run_compiler<core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>, rustc_driver_impl[945e9afaf49c7d35]::run_compiler::{closure#0}>::{closure#1}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>::{closure#0}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>::{closure#0}::{closure#0}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>
+  33:     0x7e8fceacd9eb - <<std[56fe22ad9ea837fd]::thread::Builder>::spawn_unchecked_<rustc_interface[5fea8bf9cd0b71b5]::util::run_in_thread_with_globals<rustc_interface[5fea8bf9cd0b71b5]::util::run_in_thread_pool_with_globals<rustc_interface[5fea8bf9cd0b71b5]::interface::run_compiler<core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>, rustc_driver_impl[945e9afaf49c7d35]::run_compiler::{closure#0}>::{closure#1}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>::{closure#0}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>::{closure#0}::{closure#0}, core[5ba82ee3405aa490]::result::Result<(), rustc_span[db86d96c2ae2e3a4]::ErrorGuaranteed>>::{closure#1} as core[5ba82ee3405aa490]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  34:     0x7e8fceace4b9 - std::sys::pal::unix::thread::Thread::new::thread_start::hb3d6392adeea417c
+  35:     0x7e8fc8a94ac3 - start_thread
+                               at ./nptl/pthread_create.c:442:8
+  36:     0x7e8fc8b26850 - __GI___clone3
+                               at ./misc/../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+  37:                0x0 - <unknown>
+
+
+rustc version: 1.84.0-nightly (b91a3a056 2024-11-07)
+platform: x86_64-unknown-linux-gnu
+
+query stack during panic:
+#0 [evaluate_obligation] evaluating trait selection obligation `core::iter::adapters::filter::Filter<alloc::collections::btree::map::Iter<'a, K, V>, {closure@src/related_media/overlapping_ranges.rs:26:21: 26:31}>: itertools::Itertools`
+#1 [typeck] type-checking `related_media::overlapping_ranges::<impl at src/related_media/overlapping_ranges.rs:10:1: 10:48>::get_overlapping`
+#2 [analysis] running analysis passes on this crate
+end of query stack

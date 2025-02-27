@@ -1,4 +1,4 @@
-use crate::{api::passage::segments::PassageSegments, data::bible_data::BibleData};
+use crate::{api::passage::segments::PassageSegments, bible_data::bible_data::BibleData};
 
 use super::passage::passage::Passage;
 

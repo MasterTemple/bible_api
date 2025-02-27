@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-use crate::data::book::BibleBook;
+use crate::bible_data::book::BibleBook;
 
 use super::{
     formatting_template::{
