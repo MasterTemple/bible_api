@@ -12,7 +12,7 @@ use super::{
 pub struct BibleChapter<'a> {
     // pub(super) api: &'a BibleAPI,
     #[serde(skip)]
-    pub(super) data: &'a BibleData,
+    pub(super) bible: &'a BibleData,
     pub(super) book: usize,
     pub(super) chapter: usize,
     pub(super) verses: &'a VerseDataList,
@@ -20,13 +20,13 @@ pub struct BibleChapter<'a> {
 
 impl<'a> BibleChapter<'a> {
     pub fn chapter_data(&self) -> &'a ChapterDataList {
-        &self.data.bible_contents[self.book]
+        &self.bible.bible_contents[self.book]
     }
 }
 
 impl<'a> BibleChapter<'a> {
     pub fn get_book(&self) -> BibleBook<'a> {
-        self.data.get_book(self.book).unwrap()
+        self.bible.get_book(self.book).unwrap()
     }
 
     pub fn chapter_number(&self) -> usize {
@@ -43,7 +43,7 @@ impl<'a> BibleChapter<'a> {
         // not authentic to the original texts
         let content = self.verses.get(verse - 1)?.content.as_deref();
         Some(BibleVerse {
-            data: self.data,
+            bible: self.bible,
             // api: self.api,
             book: self.book,
             chapter: self.chapter,

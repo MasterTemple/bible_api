@@ -12,7 +12,7 @@ use super::{
 pub struct BibleBook<'a> {
     // pub(super) api: &'a BibleAPI,
     #[serde(skip)]
-    pub(super) data: &'a BibleData,
+    pub(super) bible: &'a BibleData,
     pub(super) book: usize,
     pub(super) name: &'a str,
     /// **NOTE: EVERYTHING IS INDEX 0**
@@ -29,7 +29,7 @@ impl<'a> BibleBook<'a> {
     pub fn get_chapter(&self, chapter: usize) -> Option<BibleChapter<'a>> {
         let verses: &'a VerseDataList = self.chapters.get(chapter - 1)?;
         Some(BibleChapter {
-            data: self.data,
+            bible: self.bible,
             // api: self.api,
             book: self.book,
             chapter,

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{
-        bible_api::BibleAPI,
+        bible_api::{ApiData, BibleAPI},
         passage::segments::{ChapterVerse, PassageSegment},
     },
     related_media::related_media::{RelatedMedia, RelatedMediaProximity},
@@ -12,9 +12,9 @@ use super::{bible_data::BibleData, book::BibleBook, chapter::BibleChapter};
 
 #[derive(Clone, Copy, Serialize)]
 pub struct BibleVerse<'a> {
-    // pub(super) api: &'a BibleAPI,
+    // pub(super) data: &'a ApiData,
     #[serde(skip)]
-    pub(super) data: &'a BibleData,
+    pub(super) bible: &'a BibleData,
     pub(super) book: usize,
     pub(super) chapter: usize,
     pub(super) verse: usize,
@@ -44,7 +44,7 @@ pub struct BibleVerse<'a> {
 
 impl<'a> BibleVerse<'a> {
     pub fn get_book(&self) -> BibleBook<'a> {
-        self.data.get_book(self.book).unwrap()
+        self.bible.get_book(self.book).unwrap()
     }
 
     pub fn get_chapter(&self) -> BibleChapter<'a> {

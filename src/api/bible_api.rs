@@ -1,4 +1,7 @@
-use std::ops::{Deref, DerefMut};
+use std::{
+    collections::BTreeMap,
+    ops::{Deref, DerefMut},
+};
 
 use crate::{
     api::passage::segments::PassageSegments,
@@ -8,8 +11,10 @@ use crate::{
 
 use super::passage::passage::Passage;
 
+// #[derive(Default)]
 pub struct ApiData {
-    pub(crate) data: BibleData,
+    pub(crate) bibles: BTreeMap<String, BibleData>,
+    pub(crate) bible: BibleData,
     pub(crate) related_media: RelatedMediaBookOrganizer,
 }
 
@@ -53,7 +58,8 @@ impl DerefMut for BibleAPI {
 impl BibleAPI {
     pub fn load(data: BibleData) -> Self {
         Self(ApiData {
-            data,
+            bibles: Default::default(),
+            bible: data,
             related_media: RelatedMediaBookOrganizer::default(),
         })
     }
@@ -65,11 +71,11 @@ impl BibleAPI {
     /// This is meant to parse only 1 reference
     pub fn parse_reference(&self, input: &str) -> Option<Passage> {
         // match book
-        let book_match = self.data.book_regex.find_iter(input).next()?;
+        let book_match = self.bible.book_regex.find_iter(input).next()?;
         // get id
         // (this should always match though)
-        let book_id = self.data.get_book_id(&book_match.as_str())?;
-        let book = self.data.get_book(book_id)?;
+        let book_id = self.bible.get_book_id(&book_match.as_str())?;
+        let book = self.bible.get_book(book_id)?;
 
         // match passage reference segments that immediately follow
         let remaining = &input[book_match.end()..];

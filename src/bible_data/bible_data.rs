@@ -101,7 +101,7 @@ impl BibleData {
         let name = self.book_id_to_name.get(&book)?;
         let chapters = &self.bible_contents.get(book - 1)?;
         Some(BibleBook {
-            data: self,
+            bible: self,
             book,
             name,
             chapters,
